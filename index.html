@@ -95,7 +95,7 @@
 <h3 id="defer的三个原则"><a href="#defer的三个原则" class="headerlink" title="defer的三个原则"></a>defer的三个原则</h3><ol>
 <li>A deferred function’s arguments are evaluated when the defer statement is evaluated.(参数在定义时确定)</li>
 </ol>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">func <span class="function"><span class="title">a</span></span>() &#123;</div><div class="line">    i := 0</div><div class="line">    defer fmt.Println(i)</div><div class="line">    i++</div><div class="line">    <span class="built_in">return</span></div><div class="line">&#125;</div><div class="line">//打印结果:0</div></pre></td></tr></table></figure>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div></pre></td><td class="code"><pre><div class="line">//例子1</div><div class="line">func <span class="function"><span class="title">a</span></span>() &#123;</div><div class="line">    i := 0</div><div class="line">    defer fmt.Println(i)</div><div class="line">    i++</div><div class="line">    <span class="built_in">return</span></div><div class="line">&#125;</div><div class="line">//打印结果:0</div><div class="line">//例子2</div><div class="line">func <span class="function"><span class="title">main</span></span>() &#123;</div><div class="line">	a := 1</div><div class="line">	b := 2 </div><div class="line">	defer calc(<span class="string">"1"</span>, a, calc(<span class="string">"10"</span>,a,b))</div><div class="line">	a = 0</div><div class="line">	defer calc(<span class="string">"2"</span>, a, calc(<span class="string">"20"</span>,a,b))</div><div class="line">	b = 1 </div><div class="line">&#125;</div><div class="line"></div><div class="line">func calc(index string, a,b int) int&#123;</div><div class="line">	ret := a + b</div><div class="line">	fmt.Println(index, a, b, ret)</div><div class="line">	<span class="built_in">return</span> ret</div><div class="line">&#125;</div><div class="line">//打印结果：</div><div class="line">//10 1 2 3</div><div class="line">//20 0 2 2</div><div class="line">//2  0 2 2</div><div class="line">//1  1 3 4</div></pre></td></tr></table></figure>
 <ol>
 <li>Deferred function calls are executed in Last In First Out order after the surrounding function returns.(调用顺序：LIFO)</li>
 </ol>
@@ -121,7 +121,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2017/06/21/golang-defer-panic-recover/" data-id="cj46hsgno0000woo0q0uua3px" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2017/06/21/golang-defer-panic-recover/" data-id="cj46loyjy00002wo0le5g48mo" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/golang/">golang</a></li></ul>
@@ -168,7 +168,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2017/05/08/hello-world/" data-id="cj46hsgnu0001woo02ggs19wl" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2017/05/08/hello-world/" data-id="cj46loyk600012wo06i7g9xfg" class="article-share-link">Share</a>
       
       
     </footer>
