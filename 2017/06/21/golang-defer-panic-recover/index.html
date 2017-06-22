@@ -3,19 +3,19 @@
 <head>
   <meta charset="utf-8">
   
-  <title>golang-defer-panic-recover | Hmukan个人博客</title>
+  <title>golang的defer-panic-recover | Hmukan个人博客</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="讲解go语言的defer、panic、recover语句的工作方式。 deferdefer语句将函数推送到列表中，并且列表在函数返回前被调用执行(执行顺序：LIFO)。defer常用于简单函数来进行一些清理操作。 看一个例子(文件复制),不用defer时： 1234567891011121314151617func CopyFile(dstName, srcName string) (writte">
+  <meta name="description" content="讲解go语言的defer、panic、recover语句的工作方式。 deferdefer语句将函数推送到stack中，并且stack在函数返回前被调用执行(执行顺序：LIFO)。defer常用于简单函数来进行一些清理操作。 看一个例子(文件复制),不用defer时： 1234567891011121314151617func CopyFile(dstName, srcName string) (">
 <meta name="keywords" content="golang">
 <meta property="og:type" content="article">
-<meta property="og:title" content="golang-defer-panic-recover">
+<meta property="og:title" content="golang的defer-panic-recover">
 <meta property="og:url" content="http://yoursite.com/2017/06/21/golang-defer-panic-recover/index.html">
 <meta property="og:site_name" content="Hmukan个人博客">
-<meta property="og:description" content="讲解go语言的defer、panic、recover语句的工作方式。 deferdefer语句将函数推送到列表中，并且列表在函数返回前被调用执行(执行顺序：LIFO)。defer常用于简单函数来进行一些清理操作。 看一个例子(文件复制),不用defer时： 1234567891011121314151617func CopyFile(dstName, srcName string) (writte">
-<meta property="og:updated_time" content="2017-06-21T06:09:24.126Z">
+<meta property="og:description" content="讲解go语言的defer、panic、recover语句的工作方式。 deferdefer语句将函数推送到stack中，并且stack在函数返回前被调用执行(执行顺序：LIFO)。defer常用于简单函数来进行一些清理操作。 看一个例子(文件复制),不用defer时： 1234567891011121314151617func CopyFile(dstName, srcName string) (">
+<meta property="og:updated_time" content="2017-06-22T08:02:17.887Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="golang-defer-panic-recover">
-<meta name="twitter:description" content="讲解go语言的defer、panic、recover语句的工作方式。 deferdefer语句将函数推送到列表中，并且列表在函数返回前被调用执行(执行顺序：LIFO)。defer常用于简单函数来进行一些清理操作。 看一个例子(文件复制),不用defer时： 1234567891011121314151617func CopyFile(dstName, srcName string) (writte">
+<meta name="twitter:title" content="golang的defer-panic-recover">
+<meta name="twitter:description" content="讲解go语言的defer、panic、recover语句的工作方式。 deferdefer语句将函数推送到stack中，并且stack在函数返回前被调用执行(执行顺序：LIFO)。defer常用于简单函数来进行一些清理操作。 看一个例子(文件复制),不用defer时： 1234567891011121314151617func CopyFile(dstName, srcName string) (">
   
     <link rel="alternate" href="/atom.xml" title="Hmukan个人博客" type="application/atom+xml">
   
@@ -67,7 +67,7 @@
         <section id="main"><article id="post-golang-defer-panic-recover" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2017/06/21/golang-defer-panic-recover/" class="article-date">
-  <time datetime="2017-06-21T02:49:17.000Z" itemprop="datePublished">2017-06-21</time>
+  <time datetime="2017-06-21T12:11:17.000Z" itemprop="datePublished">2017-06-21</time>
 </a>
     
   </div>
@@ -78,7 +78,7 @@
         
   
     <h1 class="article-title" itemprop="name">
-      golang-defer-panic-recover
+      golang的defer-panic-recover
     </h1>
   
 
@@ -87,7 +87,7 @@
     <div class="article-entry" itemprop="articleBody">
       
         <p>讲解go语言的defer、panic、recover语句的工作方式。</p>
-<h2 id="defer"><a href="#defer" class="headerlink" title="defer"></a>defer</h2><p>defer语句将函数推送到列表中，并且列表在函数返回前被调用执行(执行顺序：LIFO)。<br>defer常用于简单函数来进行一些清理操作。</p>
+<h2 id="defer"><a href="#defer" class="headerlink" title="defer"></a>defer</h2><p>defer语句将函数推送到stack中，并且stack在函数返回前被调用执行(执行顺序：LIFO)。<br>defer常用于简单函数来进行一些清理操作。</p>
 <p>看一个例子(文件复制),不用defer时：</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line">func CopyFile(dstName, srcName string) (written int64, err error) &#123;</div><div class="line">    src, err := os.Open(srcName)</div><div class="line">    <span class="keyword">if</span> err != nil &#123;</div><div class="line">        <span class="built_in">return</span></div><div class="line">    &#125;</div><div class="line"></div><div class="line">    dst, err := os.Create(dstName)</div><div class="line">    <span class="keyword">if</span> err != nil &#123;</div><div class="line">	    //<span class="comment">#1</span></div><div class="line">        <span class="built_in">return</span></div><div class="line">    &#125;</div><div class="line"></div><div class="line">    written, err = io.Copy(dst, src)</div><div class="line">    dst.Close()</div><div class="line">    src.Close()</div><div class="line">    <span class="built_in">return</span></div><div class="line">&#125;</div></pre></td></tr></table></figure>
 <p>上面的例子可以运行，但是有个bug。如果os.Create调用失败，导致函数返回但src文件尚未关闭。解决这个bug很容易，在#1的地方调用src.Close()，如果在一个复杂的函数中就不容易发现和解决。<br>通过defer语句保证函数返回前文件能正常关闭。例子如下：</p>
@@ -110,7 +110,7 @@
 <p>执行结果<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div></pre></td><td class="code"><pre><div class="line">//结果输出：</div><div class="line">Calling g.</div><div class="line">Printing <span class="keyword">in</span> g 0</div><div class="line">Printing <span class="keyword">in</span> g 1</div><div class="line">Printing <span class="keyword">in</span> g 2</div><div class="line">Printing <span class="keyword">in</span> g 3</div><div class="line">Panicking!</div><div class="line">Defer <span class="keyword">in</span> g 3</div><div class="line">Defer <span class="keyword">in</span> g 2</div><div class="line">Defer <span class="keyword">in</span> g 1</div><div class="line">Defer <span class="keyword">in</span> g 0</div><div class="line">Recovered <span class="keyword">in</span> f 4</div><div class="line">Returned normally from f.</div><div class="line"></div><div class="line">//如果没有f函数没defer函数，结果输出：</div><div class="line">Calling g.</div><div class="line">Printing <span class="keyword">in</span> g 0</div><div class="line">Printing <span class="keyword">in</span> g 1</div><div class="line">Printing <span class="keyword">in</span> g 2</div><div class="line">Printing <span class="keyword">in</span> g 3</div><div class="line">Panicking!</div><div class="line">Defer <span class="keyword">in</span> g 3</div><div class="line">Defer <span class="keyword">in</span> g 2</div><div class="line">Defer <span class="keyword">in</span> g 1</div><div class="line">Defer <span class="keyword">in</span> g 0</div><div class="line">panic: 4</div><div class="line"> </div><div class="line">panic PC=0x2a9<span class="built_in">cd</span>8</div><div class="line">[stack trace omitted]</div></pre></td></tr></table></figure></p>
 <h2 id="defer的一般用途"><a href="#defer的一般用途" class="headerlink" title="defer的一般用途"></a>defer的一般用途</h2><ol>
 <li>资源的清理(如文件关闭,连接关闭,chan的关闭等等)。</li>
-<li><p>锁(mutex)的释放</p>
+<li><p>锁(sync.Mutex)的释放</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">mu.Lock()</div><div class="line">defer mu.Unlock()</div></pre></td></tr></table></figure>
 </li>
 <li><p>打印尾部</p>
@@ -121,7 +121,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2017/06/21/golang-defer-panic-recover/" data-id="cj46loyjy00002wo0le5g48mo" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2017/06/21/golang-defer-panic-recover/" data-id="cj4855txt000098o0bl5tsn1o" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/golang/">golang</a></li></ul>
@@ -132,8 +132,17 @@
     
 <nav id="article-nav">
   
+    <a href="/2017/06/22/golang-nil/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          理解golang的nil
+        
+      </div>
+    </a>
   
-    <a href="/2017/05/08/hello-world/" id="article-nav-older" class="article-nav-link-wrap">
+  
+    <a href="/2017/06/10/hello-world/" id="article-nav-older" class="article-nav-link-wrap">
       <strong class="article-nav-caption">Older</strong>
       <div class="article-nav-title">Hexo入门</div>
     </a>
@@ -154,7 +163,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title">标签</h3>
     <div class="widget">
-      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/golang/">golang</a></li></ul>
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/golang/">golang</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hexo/">hexo</a></li></ul>
     </div>
   </div>
 
@@ -164,7 +173,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title">归档</h3>
     <div class="widget">
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/06/">六月 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">五月 2017</a></li></ul>
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/06/">六月 2017</a></li></ul>
     </div>
   </div>
 
@@ -177,11 +186,15 @@
       <ul>
         
           <li>
-            <a href="/2017/06/21/golang-defer-panic-recover/">golang-defer-panic-recover</a>
+            <a href="/2017/06/22/golang-nil/">理解golang的nil</a>
           </li>
         
           <li>
-            <a href="/2017/05/08/hello-world/">Hexo入门</a>
+            <a href="/2017/06/21/golang-defer-panic-recover/">golang的defer-panic-recover</a>
+          </li>
+        
+          <li>
+            <a href="/2017/06/10/hello-world/">Hexo入门</a>
           </li>
         
       </ul>

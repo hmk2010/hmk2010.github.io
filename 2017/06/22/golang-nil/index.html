@@ -3,17 +3,19 @@
 <head>
   <meta charset="utf-8">
   
-  <title>Hmukan个人博客</title>
+  <title>理解golang的nil | Hmukan个人博客</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="程序员的成长点滴">
-<meta property="og:type" content="website">
-<meta property="og:title" content="Hmukan个人博客">
-<meta property="og:url" content="http://yoursite.com/index.html">
+  <meta name="description" content="golang的nil在概念上和其它语言的null、None、nil、NULL一样，都指代零值或空值。nil是预先说明的标识符，也即通常意义上的关键字。golang中，nil只能赋值给pointer、channel、func、interface、map、slice类型的变量。如果未遵循这个规则，则会引发panic。零值是go中变量在声明之后但是未初始化被赋予的该类型的一个默认值。 nil和nil是不">
+<meta name="keywords" content="golang">
+<meta property="og:type" content="article">
+<meta property="og:title" content="理解golang的nil">
+<meta property="og:url" content="http://yoursite.com/2017/06/22/golang-nil/index.html">
 <meta property="og:site_name" content="Hmukan个人博客">
-<meta property="og:description" content="程序员的成长点滴">
+<meta property="og:description" content="golang的nil在概念上和其它语言的null、None、nil、NULL一样，都指代零值或空值。nil是预先说明的标识符，也即通常意义上的关键字。golang中，nil只能赋值给pointer、channel、func、interface、map、slice类型的变量。如果未遵循这个规则，则会引发panic。零值是go中变量在声明之后但是未初始化被赋予的该类型的一个默认值。 nil和nil是不">
+<meta property="og:updated_time" content="2017-06-22T08:02:02.009Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Hmukan个人博客">
-<meta name="twitter:description" content="程序员的成长点滴">
+<meta name="twitter:title" content="理解golang的nil">
+<meta name="twitter:description" content="golang的nil在概念上和其它语言的null、None、nil、NULL一样，都指代零值或空值。nil是预先说明的标识符，也即通常意义上的关键字。golang中，nil只能赋值给pointer、channel、func、interface、map、slice类型的变量。如果未遵循这个规则，则会引发panic。零值是go中变量在声明之后但是未初始化被赋予的该类型的一个默认值。 nil和nil是不">
   
     <link rel="alternate" href="/atom.xml" title="Hmukan个人博客" type="application/atom+xml">
   
@@ -62,9 +64,7 @@
   </div>
 </header>
       <div class="outer">
-        <section id="main">
-  
-    <article id="post-golang-nil" class="article article-type-post" itemscope itemprop="blogPost">
+        <section id="main"><article id="post-golang-nil" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2017/06/22/golang-nil/" class="article-date">
   <time datetime="2017-06-22T13:42:46.000Z" itemprop="datePublished">2017-06-22</time>
@@ -77,8 +77,8 @@
       <header class="article-header">
         
   
-    <h1 itemprop="name">
-      <a class="article-title" href="/2017/06/22/golang-nil/">理解golang的nil</a>
+    <h1 class="article-title" itemprop="name">
+      理解golang的nil
     </h1>
   
 
@@ -128,126 +128,19 @@
     </footer>
   </div>
   
-</article>
-
-
+    
+<nav id="article-nav">
   
-    <article id="post-golang-defer-panic-recover" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2017/06/21/golang-defer-panic-recover/" class="article-date">
-  <time datetime="2017-06-21T12:11:17.000Z" itemprop="datePublished">2017-06-21</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
   
-    <h1 itemprop="name">
-      <a class="article-title" href="/2017/06/21/golang-defer-panic-recover/">golang的defer-panic-recover</a>
-    </h1>
+    <a href="/2017/06/21/golang-defer-panic-recover/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">golang的defer-panic-recover</div>
+    </a>
   
+</nav>
 
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>讲解go语言的defer、panic、recover语句的工作方式。</p>
-<h2 id="defer"><a href="#defer" class="headerlink" title="defer"></a>defer</h2><p>defer语句将函数推送到stack中，并且stack在函数返回前被调用执行(执行顺序：LIFO)。<br>defer常用于简单函数来进行一些清理操作。</p>
-<p>看一个例子(文件复制),不用defer时：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line">func CopyFile(dstName, srcName string) (written int64, err error) &#123;</div><div class="line">    src, err := os.Open(srcName)</div><div class="line">    <span class="keyword">if</span> err != nil &#123;</div><div class="line">        <span class="built_in">return</span></div><div class="line">    &#125;</div><div class="line"></div><div class="line">    dst, err := os.Create(dstName)</div><div class="line">    <span class="keyword">if</span> err != nil &#123;</div><div class="line">	    //<span class="comment">#1</span></div><div class="line">        <span class="built_in">return</span></div><div class="line">    &#125;</div><div class="line"></div><div class="line">    written, err = io.Copy(dst, src)</div><div class="line">    dst.Close()</div><div class="line">    src.Close()</div><div class="line">    <span class="built_in">return</span></div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>上面的例子可以运行，但是有个bug。如果os.Create调用失败，导致函数返回但src文件尚未关闭。解决这个bug很容易，在#1的地方调用src.Close()，如果在一个复杂的函数中就不容易发现和解决。<br>通过defer语句保证函数返回前文件能正常关闭。例子如下：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">func CopyFile(dstName, srcName string) (written int64, err error) &#123;</div><div class="line">    src, err := os.Open(srcName)</div><div class="line">    <span class="keyword">if</span> err != nil &#123;</div><div class="line">        <span class="built_in">return</span></div><div class="line">    &#125;</div><div class="line">    defer src.Close()</div><div class="line"></div><div class="line">    dst, err := os.Create(dstName)</div><div class="line">    <span class="keyword">if</span> err != nil &#123;</div><div class="line">        <span class="built_in">return</span></div><div class="line">    &#125;</div><div class="line">    defer dst.Close()</div><div class="line"></div><div class="line">    <span class="built_in">return</span> io.Copy(dst, src)</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<h3 id="defer的三个原则"><a href="#defer的三个原则" class="headerlink" title="defer的三个原则"></a>defer的三个原则</h3><ol>
-<li>A deferred function’s arguments are evaluated when the defer statement is evaluated.(参数在定义时确定)</li>
-</ol>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div></pre></td><td class="code"><pre><div class="line">//例子1</div><div class="line">func <span class="function"><span class="title">a</span></span>() &#123;</div><div class="line">    i := 0</div><div class="line">    defer fmt.Println(i)</div><div class="line">    i++</div><div class="line">    <span class="built_in">return</span></div><div class="line">&#125;</div><div class="line">//打印结果:0</div><div class="line">//例子2</div><div class="line">func <span class="function"><span class="title">main</span></span>() &#123;</div><div class="line">	a := 1</div><div class="line">	b := 2 </div><div class="line">	defer calc(<span class="string">"1"</span>, a, calc(<span class="string">"10"</span>,a,b))</div><div class="line">	a = 0</div><div class="line">	defer calc(<span class="string">"2"</span>, a, calc(<span class="string">"20"</span>,a,b))</div><div class="line">	b = 1 </div><div class="line">&#125;</div><div class="line"></div><div class="line">func calc(index string, a,b int) int&#123;</div><div class="line">	ret := a + b</div><div class="line">	fmt.Println(index, a, b, ret)</div><div class="line">	<span class="built_in">return</span> ret</div><div class="line">&#125;</div><div class="line">//打印结果：</div><div class="line">//10 1 2 3</div><div class="line">//20 0 2 2</div><div class="line">//2  0 2 2</div><div class="line">//1  1 3 4</div></pre></td></tr></table></figure>
-<ol>
-<li>Deferred function calls are executed in Last In First Out order after the surrounding function returns.(调用顺序：LIFO)</li>
-</ol>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">func <span class="function"><span class="title">b</span></span>() &#123;</div><div class="line">    <span class="keyword">for</span> i := 0; i &lt; 4; i++ &#123;</div><div class="line">        defer fmt.Print(i)</div><div class="line">    &#125;</div><div class="line">&#125;</div><div class="line">//打印结果:3210</div></pre></td></tr></table></figure>
-<ol>
-<li>Deferred functions may read and assign to the returning function’s named return values(返回前可以读取和修改函数的命名参数)</li>
-</ol>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">func c() (i int) &#123;</div><div class="line">    defer <span class="function"><span class="title">func</span></span>() &#123; i++ &#125;()</div><div class="line">    <span class="built_in">return</span> 1</div><div class="line">&#125;</div><div class="line">//打印结果:2</div><div class="line">//说明：go的<span class="built_in">return</span>语句不是原子命令。包含赋值(参数赋值)、RET(返回)两个过程。</div><div class="line">// 程序可以这样理解：i=1 <span class="function"><span class="title">func</span></span>()&#123;i++&#125; RET</div></pre></td></tr></table></figure>
-<h2 id="panic"><a href="#panic" class="headerlink" title="panic"></a>panic</h2><p>panic停止程序流程并进入panicking状态。当一个函数F调用panic,F函数停止执行并正常执行所以defer函数，然后F返回到它的调用者。对于调用者，F就像调用panic一样。在当前goroutine中，函数这样一层层往上返回，执行程序崩溃的地方。</p>
-<h2 id="recover"><a href="#recover" class="headerlink" title="recover"></a>recover</h2><p>recover用于恢复panicking状态的协程。只在defer函数里面使用。如果是普通执行，recover只是返回nil，对程序没有影响。<br>下面例子说明panic,recover的工作方式</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div></pre></td><td class="code"><pre><div class="line">package main</div><div class="line"></div><div class="line">import <span class="string">"fmt"</span></div><div class="line"></div><div class="line">func <span class="function"><span class="title">main</span></span>() &#123;</div><div class="line">    f()</div><div class="line">    fmt.Println(<span class="string">"Returned normally from f."</span>)</div><div class="line">&#125;</div><div class="line"></div><div class="line">func <span class="function"><span class="title">f</span></span>() &#123;</div><div class="line">    defer <span class="function"><span class="title">func</span></span>() &#123;</div><div class="line">        <span class="keyword">if</span> r := recover(); r != nil &#123;</div><div class="line">            fmt.Println(<span class="string">"Recovered in f"</span>, r)</div><div class="line">        &#125;</div><div class="line">    &#125;()</div><div class="line">    fmt.Println(<span class="string">"Calling g."</span>)</div><div class="line">    g(0)</div><div class="line">    fmt.Println(<span class="string">"Returned normally from g."</span>)</div><div class="line">&#125;</div><div class="line"></div><div class="line">func g(i int) &#123;</div><div class="line">    <span class="keyword">if</span> i &gt; 3 &#123;</div><div class="line">        fmt.Println(<span class="string">"Panicking!"</span>)</div><div class="line">        panic(fmt.S<span class="built_in">printf</span>(<span class="string">"%v"</span>, i))</div><div class="line">    &#125;</div><div class="line">    defer fmt.Println(<span class="string">"Defer in g"</span>, i)</div><div class="line">    fmt.Println(<span class="string">"Printing in g"</span>, i)</div><div class="line">    g(i + 1)</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>执行结果<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div></pre></td><td class="code"><pre><div class="line">//结果输出：</div><div class="line">Calling g.</div><div class="line">Printing <span class="keyword">in</span> g 0</div><div class="line">Printing <span class="keyword">in</span> g 1</div><div class="line">Printing <span class="keyword">in</span> g 2</div><div class="line">Printing <span class="keyword">in</span> g 3</div><div class="line">Panicking!</div><div class="line">Defer <span class="keyword">in</span> g 3</div><div class="line">Defer <span class="keyword">in</span> g 2</div><div class="line">Defer <span class="keyword">in</span> g 1</div><div class="line">Defer <span class="keyword">in</span> g 0</div><div class="line">Recovered <span class="keyword">in</span> f 4</div><div class="line">Returned normally from f.</div><div class="line"></div><div class="line">//如果没有f函数没defer函数，结果输出：</div><div class="line">Calling g.</div><div class="line">Printing <span class="keyword">in</span> g 0</div><div class="line">Printing <span class="keyword">in</span> g 1</div><div class="line">Printing <span class="keyword">in</span> g 2</div><div class="line">Printing <span class="keyword">in</span> g 3</div><div class="line">Panicking!</div><div class="line">Defer <span class="keyword">in</span> g 3</div><div class="line">Defer <span class="keyword">in</span> g 2</div><div class="line">Defer <span class="keyword">in</span> g 1</div><div class="line">Defer <span class="keyword">in</span> g 0</div><div class="line">panic: 4</div><div class="line"> </div><div class="line">panic PC=0x2a9<span class="built_in">cd</span>8</div><div class="line">[stack trace omitted]</div></pre></td></tr></table></figure></p>
-<h2 id="defer的一般用途"><a href="#defer的一般用途" class="headerlink" title="defer的一般用途"></a>defer的一般用途</h2><ol>
-<li>资源的清理(如文件关闭,连接关闭,chan的关闭等等)。</li>
-<li><p>锁(sync.Mutex)的释放</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">mu.Lock()</div><div class="line">defer mu.Unlock()</div></pre></td></tr></table></figure>
-</li>
-<li><p>打印尾部</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="built_in">print</span>Header()</div><div class="line">defer <span class="built_in">print</span>Footer()</div></pre></td></tr></table></figure>
-</li>
-</ol>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2017/06/21/golang-defer-panic-recover/" data-id="cj4855txt000098o0bl5tsn1o" class="article-share-link">Share</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/golang/">golang</a></li></ul>
-
-    </footer>
-  </div>
   
 </article>
-
-
-  
-    <article id="post-hello-world" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2017/06/10/hello-world/" class="article-date">
-  <time datetime="2017-06-10T12:49:17.000Z" itemprop="datePublished">2017-06-10</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2017/06/10/hello-world/">Hexo入门</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>Welcome to <a href="https://hexo.io/" target="_blank" rel="external">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/" target="_blank" rel="external">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html" target="_blank" rel="external">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues" target="_blank" rel="external">GitHub</a>.</p>
-<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ hexo new <span class="string">"My New Post"</span></div></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/writing.html" target="_blank" rel="external">Writing</a></p>
-<h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ hexo server</div></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/server.html" target="_blank" rel="external">Server</a></p>
-<h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ hexo generate</div></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/generating.html" target="_blank" rel="external">Generating</a></p>
-<h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ hexo deploy</div></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/deployment.html" target="_blank" rel="external">Deployment</a></p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2017/06/10/hello-world/" data-id="cj4855ty7000398o094fwzlca" class="article-share-link">Share</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/hexo/">hexo</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-  
 
 </section>
         
