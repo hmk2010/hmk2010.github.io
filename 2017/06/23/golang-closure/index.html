@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>golang closure(闭包) | Hmukan个人博客</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="什么是闭包？闭包 = 匿名函数 + 外部变量引用 介绍闭包前，先来见一下匿名函数(anonymous function). 匿名函数匿名函数：和普通函数类似，但它没有名称。它像变量一样动态创建的。 1234567891011121314151617181920212223242526272829303132//普通函数func DoStuff() &amp;#123;    // Do stuff&amp;#12">
+<meta name="keywords" content="golang">
+<meta property="og:type" content="article">
+<meta property="og:title" content="golang closure(闭包)">
+<meta property="og:url" content="http://yoursite.com/2017/06/23/golang-closure/index.html">
+<meta property="og:site_name" content="Hmukan个人博客">
+<meta property="og:description" content="什么是闭包？闭包 = 匿名函数 + 外部变量引用 介绍闭包前，先来见一下匿名函数(anonymous function). 匿名函数匿名函数：和普通函数类似，但它没有名称。它像变量一样动态创建的。 1234567891011121314151617181920212223242526272829303132//普通函数func DoStuff() &amp;#123;    // Do stuff&amp;#12">
+<meta property="og:updated_time" content="2017-06-23T09:39:06.875Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="golang closure(闭包)">
+<meta name="twitter:description" content="什么是闭包？闭包 = 匿名函数 + 外部变量引用 介绍闭包前，先来见一下匿名函数(anonymous function). 匿名函数匿名函数：和普通函数类似，但它没有名称。它像变量一样动态创建的。 1234567891011121314151617181920212223242526272829303132//普通函数func DoStuff() &amp;#123;    // Do stuff&amp;#12">
+  
+    <link rel="alternate" href="/atom.xml" title="Hmukan个人博客" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
+
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Hmukan个人博客</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">首页</a>
+        
+          <a class="main-nav-link" href="/archives">归档</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="搜索"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-golang-closure" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2017/06/23/golang-closure/" class="article-date">
+  <time datetime="2017-06-23T11:29:05.000Z" itemprop="datePublished">2017-06-23</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      golang closure(闭包)
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h2 id="什么是闭包？"><a href="#什么是闭包？" class="headerlink" title="什么是闭包？"></a>什么是闭包？</h2><p>闭包 = 匿名函数 + 外部变量引用</p>
+<p>介绍闭包前，先来见一下匿名函数(anonymous function).</p>
+<h3 id="匿名函数"><a href="#匿名函数" class="headerlink" title="匿名函数"></a>匿名函数</h3><p>匿名函数：和普通函数类似，但它没有名称。它像变量一样动态创建的。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div></pre></td><td class="code"><pre><div class="line">//普通函数</div><div class="line">func <span class="function"><span class="title">DoStuff</span></span>() &#123;  </div><div class="line">  // Do stuff</div><div class="line">&#125;</div><div class="line"></div><div class="line">//匿名函数 </div><div class="line">var DoStuff func() = <span class="function"><span class="title">func</span></span>() &#123;  </div><div class="line">  // Do stuff</div><div class="line">&#125;</div><div class="line"></div><div class="line"></div><div class="line">package main</div><div class="line"></div><div class="line">import <span class="string">"fmt"</span></div><div class="line"></div><div class="line">var DoStuff func() = <span class="function"><span class="title">func</span></span>() &#123;  //匿名函数1</div><div class="line">  // Do stuff</div><div class="line">&#125;</div><div class="line"></div><div class="line">func <span class="function"><span class="title">main</span></span>() &#123;  </div><div class="line">  DoStuff()</div><div class="line"></div><div class="line">  DoStuff = <span class="function"><span class="title">func</span></span>() &#123; //匿名函数2</div><div class="line">    fmt.Println(<span class="string">"Doing stuff!"</span>)</div><div class="line">  &#125;</div><div class="line">  DoStuff()</div><div class="line"></div><div class="line">  DoStuff = <span class="function"><span class="title">func</span></span>() &#123; //匿名函数3</div><div class="line">    fmt.Println(<span class="string">"Doing other stuff."</span>)</div><div class="line">  &#125;</div><div class="line">  DoStuff()</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h3 id="闭包函数"><a href="#闭包函数" class="headerlink" title="闭包函数"></a>闭包函数</h3><p>闭包是一个特殊的匿名函数包含外部变量的引用。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line">package main</div><div class="line"></div><div class="line">import <span class="string">"fmt"</span></div><div class="line"></div><div class="line">func newCounter() func() int &#123;  </div><div class="line">  n := 0</div><div class="line">  <span class="built_in">return</span> func() int &#123; //匿名函数</div><div class="line">    n += 1  //外部变量引用</div><div class="line">    <span class="built_in">return</span> n</div><div class="line">  &#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line">func <span class="function"><span class="title">main</span></span>() &#123;  </div><div class="line">  counter := newCounter()</div><div class="line">  fmt.Println(counter())</div><div class="line">  fmt.Println(counter())</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h2 id="闭包的应用场景"><a href="#闭包的应用场景" class="headerlink" title="闭包的应用场景"></a>闭包的应用场景</h2><ol>
+<li><p>隔离数据<br>外部函数返回后，闭包函数还可以保持对数据的访问。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line">package main</div><div class="line"></div><div class="line">import <span class="string">"fmt"</span></div><div class="line"></div><div class="line">func <span class="function"><span class="title">main</span></span>() &#123;  </div><div class="line">  gen := makeFibGen()</div><div class="line">  <span class="keyword">for</span> i := 0; i &lt; 10; i++ &#123;</div><div class="line">    fmt.Println(gen())</div><div class="line">  &#125;</div><div class="line">&#125;</div><div class="line">//斐波那契数： 1 1 2 3 5 8 13 21 34 55 ...</div><div class="line">func makeFibGen() func() int &#123;  </div><div class="line">  f1 := 0  </div><div class="line">  f2 := 1  //f1,f2数据得隔离</div><div class="line">  <span class="built_in">return</span> func() int &#123;</div><div class="line">    f2, f1 = (f1 + f2), f2</div><div class="line">    <span class="built_in">return</span> f1</div><div class="line">  &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+</li>
+<li><p>包装函数和创建中间件(middleware)<br>函数在golang中是第一公民。不仅可以动态创建匿名函数，也可作为函数参数进行传递.</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div></pre></td><td class="code"><pre><div class="line">package main</div><div class="line"></div><div class="line">import (  </div><div class="line">  <span class="string">"fmt"</span></div><div class="line">  <span class="string">"net/http"</span></div><div class="line">  <span class="string">"time"</span></div><div class="line">)</div><div class="line"></div><div class="line">func <span class="function"><span class="title">main</span></span>() &#123;  </div><div class="line">  http.HandleFunc(<span class="string">"/hello"</span>, timed(hello))</div><div class="line">  http.ListenAndServe(<span class="string">":3000"</span>, nil)</div><div class="line">&#125;</div><div class="line"></div><div class="line">func timed(f func(http.ResponseWriter, *http.Request)) func(http.ResponseWriter, *http.Request) &#123;  </div><div class="line">  <span class="built_in">return</span> func(w http.ResponseWriter, r *http.Request) &#123;</div><div class="line">    //闭包函数封装了更多的处理逻辑</div><div class="line">    start := time.Now()</div><div class="line">    f(w, r)</div><div class="line">    end := time.Now()</div><div class="line">    fmt.Println(<span class="string">"The request took"</span>, end.Sub(start))</div><div class="line">  &#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line">func hello(w http.ResponseWriter, r *http.Request) &#123;  </div><div class="line">  fmt.Fprintln(w, <span class="string">"&lt;h1&gt;Hello!&lt;/h1&gt;"</span>)</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+</li>
+<li><p>sort包的二叉查找</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line">package main</div><div class="line"></div><div class="line">import (  </div><div class="line">  <span class="string">"fmt"</span></div><div class="line">  <span class="string">"sort"</span></div><div class="line">)</div><div class="line"></div><div class="line">func <span class="function"><span class="title">main</span></span>() &#123;  </div><div class="line">  numbers := []int&#123;1, 11, -5, 8, 2, 0, 12&#125;</div><div class="line">  sort.Ints(numbers)</div><div class="line">  fmt.Println(<span class="string">"Sorted:"</span>, numbers)</div><div class="line"></div><div class="line">  index := sort.Search(len(numbers), func(i int) bool &#123; //闭包函数</div><div class="line">    <span class="built_in">return</span> numbers[i] &gt;= 7</div><div class="line">  &#125;)</div><div class="line">  fmt.Println(<span class="string">"The first number &gt;= 7 is at index:"</span>, index)</div><div class="line">  fmt.Println(<span class="string">"The first number &gt;= 7 is:"</span>, numbers[index])</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+</li>
+</ol>
+<h2 id="闭包的常见陷阱和错误"><a href="#闭包的常见陷阱和错误" class="headerlink" title="闭包的常见陷阱和错误"></a>闭包的常见陷阱和错误</h2><ol>
+<li><p>defer和go语句的参数是-函数调用</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div></pre></td><td class="code"><pre><div class="line">func <span class="function"><span class="title">main</span></span>() &#123;  </div><div class="line">  defer <span class="function"><span class="title">func</span></span>() &#123;</div><div class="line">    fmt.Prinltn(<span class="string">"teardown"</span>)</div><div class="line">  &#125;</div><div class="line">&#125;</div><div class="line">//compilation error expression <span class="keyword">in</span> go/defer must be <span class="keyword">function</span> call</div><div class="line"></div><div class="line">func <span class="function"><span class="title">main</span></span>() &#123;  </div><div class="line">  defer setup()</div><div class="line">&#125;</div><div class="line"></div><div class="line">func setup() <span class="function"><span class="title">func</span></span>() &#123;  </div><div class="line">  fmt.Println(<span class="string">"pretend to set things up"</span>)</div><div class="line"></div><div class="line">  <span class="built_in">return</span> <span class="function"><span class="title">func</span></span>() &#123;</div><div class="line">    fmt.Println(<span class="string">"pretend to tear things down"</span>)</div><div class="line">  &#125;</div><div class="line">&#125;</div><div class="line">//输出结果? </div><div class="line">//如何改正?</div></pre></td></tr></table></figure>
+</li>
+<li><p>for语句的变量通过引用传递<br>for i,v := range m { v1 := v}<br>//在迭代过程: i,v是相同的变量(地址一样)，只是值在变化; v1是不同的变量。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div></pre></td><td class="code"><pre><div class="line">package main</div><div class="line"></div><div class="line">import <span class="string">"fmt"</span></div><div class="line"></div><div class="line">func <span class="function"><span class="title">main</span></span>() &#123;  </div><div class="line">  var <span class="built_in">functions</span> []func()</div><div class="line">  // <span class="keyword">for</span> + 闭包</div><div class="line">  <span class="keyword">for</span> i := 0; i &lt; 10; i++ &#123;</div><div class="line">    <span class="built_in">functions</span> = append(<span class="built_in">functions</span>, <span class="function"><span class="title">func</span></span>() &#123;</div><div class="line">      fmt.Println(i)</div><div class="line">    &#125;)</div><div class="line">  &#125;</div><div class="line"></div><div class="line">  <span class="keyword">for</span> _, f := range <span class="built_in">functions</span> &#123;</div><div class="line">    f()</div><div class="line">  &#125;</div><div class="line">&#125;</div><div class="line">//运行结果：</div><div class="line"></div><div class="line">func <span class="function"><span class="title">main</span></span>() &#123;  </div><div class="line">  var <span class="built_in">functions</span> []func()</div><div class="line">  </div><div class="line">  //1. 改进方案1--代码不清晰</div><div class="line">  <span class="keyword">for</span> i := 0; i &lt; 10; i++ &#123;</div><div class="line">	<span class="built_in">functions</span> = append(<span class="built_in">functions</span>, func(val int) <span class="function"><span class="title">func</span></span>() &#123;</div><div class="line">		<span class="built_in">return</span> <span class="function"><span class="title">func</span></span>() &#123;</div><div class="line">			fmt.Println(val)</div><div class="line">		&#125;</div><div class="line">    &#125;(i))</div><div class="line">  &#125;</div><div class="line">  </div><div class="line">  //2. 改进方案2-代码清晰</div><div class="line">  fn := func(val int) <span class="function"><span class="title">func</span></span>() &#123;</div><div class="line">    <span class="built_in">return</span> <span class="function"><span class="title">func</span></span>() &#123;</div><div class="line">      fmt.Println(val)</div><div class="line">    &#125;</div><div class="line">  &#125;</div><div class="line">  <span class="keyword">for</span> i := 0; i &lt; 10; i++ &#123;</div><div class="line">    <span class="built_in">functions</span> = append(<span class="built_in">functions</span>, fn(i))</div><div class="line">  &#125;</div><div class="line"></div><div class="line">  ...</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+</li>
+<li><p>go语句和闭包</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div></pre></td><td class="code"><pre><div class="line">func <span class="function"><span class="title">main</span></span>() &#123;</div><div class="line">    <span class="keyword">done</span> := make(chan bool)</div><div class="line"></div><div class="line">    values := []string&#123;<span class="string">"a"</span>, <span class="string">"b"</span>, <span class="string">"c"</span>&#125;</div><div class="line">    <span class="keyword">for</span> _, v := range values &#123;</div><div class="line">        go <span class="function"><span class="title">func</span></span>() &#123;</div><div class="line">            fmt.Println(v) //因为v是一个相同实例,所以所有闭包共享v这个变量。</div><div class="line">            <span class="keyword">done</span> &lt;- <span class="literal">true</span></div><div class="line">        &#125;()</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    // <span class="built_in">wait</span> <span class="keyword">for</span> all goroutines to complete before exiting</div><div class="line">    <span class="keyword">for</span> _ = range values &#123;</div><div class="line">        &lt;-done</div><div class="line">    &#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line">//改进1</div><div class="line">	<span class="keyword">for</span> _, v := range values &#123;</div><div class="line">		go func(u string) &#123;</div><div class="line">			fmt.Println(u)</div><div class="line">			<span class="keyword">done</span> &lt;- <span class="literal">true</span></div><div class="line">		&#125;(v)</div><div class="line">	&#125;</div><div class="line">//改进2</div><div class="line">    <span class="keyword">for</span> _, v := range values &#123;</div><div class="line">        v := v // create a new <span class="string">'v'</span>.</div><div class="line">        go <span class="function"><span class="title">func</span></span>() &#123;</div><div class="line">            fmt.Println(v)</div><div class="line">            <span class="keyword">done</span> &lt;- <span class="literal">true</span></div><div class="line">        &#125;()</div><div class="line">    &#125;</div></pre></td></tr></table></figure>
+</li>
+</ol>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2017/06/23/golang-closure/" data-id="cj49o195b0000cwo0vgqsebwr" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/golang/">golang</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+  
+    <a href="/2017/06/22/golang-nil/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">理解golang的nil</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">标签</h3>
+    <div class="widget">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/golang/">golang</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hexo/">hexo</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">归档</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/06/">六月 2017</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">最新文章</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2017/06/23/golang-closure/">golang closure(闭包)</a>
+          </li>
+        
+          <li>
+            <a href="/2017/06/22/golang-nil/">理解golang的nil</a>
+          </li>
+        
+          <li>
+            <a href="/2017/06/21/golang-defer-panic-recover/">golang的defer-panic-recover</a>
+          </li>
+        
+          <li>
+            <a href="/2017/06/10/hello-world/">Hexo入门</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2017 Hmukan<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">首页</a>
+  
+    <a href="/archives" class="mobile-nav-link">归档</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+  </div>
+</body>
+</html>
